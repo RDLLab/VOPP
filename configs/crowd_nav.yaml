@@ -1,0 +1,29 @@
+#seed: 5003
+
+logfile_postfix: crowd_nav
+
+map_size_x: 50
+map_size_y: 40
+num_peds: 300
+num_near_peds: 6
+curiosity_distance: 4.0
+curiosity_prob: 0.5
+move_prob: 0.9
+
+discount_factor: 0.95
+n_steps: 200
+
+num_envs: 30000
+max_sampled_episodes: 100000000
+simulate_headless: False
+pomdp_model: crowd_nav
+reference_policy: preference_policy
+policy: prob_max_policy
+backup_fn: ref_solver_iterative
+eta: 0.5
+alpha_t: 1.0
+beta_t: 1.0
+max_search_depth: 90
+num_belief_particles: 30000
+
+continuous_observations: False

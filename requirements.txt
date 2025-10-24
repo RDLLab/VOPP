@@ -1,0 +1,9 @@
+# requirements.txt
+--extra-index-url https://download.pytorch.org/whl/cu124
+
+torch==2.7.1
+matplotlib~=3.10
+numpy~=2.3
+PyYAML~=6.0
+ray~=2.49
+scipy~=1.16
