@@ -72,7 +72,8 @@ class RefSolverIterativeBackupFn(BackupFn):
 
             # 3d. Compute Q(b, a)
             R_b_a = C_act[unique_parent_actions] / (N_act[unique_parent_actions] + 1e-10)
-            Q = R_b_a + gamma * weighted_values
+            p_nonterm = dynamic_N_act / (N_act[unique_parent_actions] + 1e-8)
+            Q = R_b_a + gamma * p_nonterm * weighted_values            
 
             # 3b. Get parent observation nodes of those action nodes
             parent_obs_of_actions = tree.action_nodes[unique_parent_actions, 0].to(torch.long)
