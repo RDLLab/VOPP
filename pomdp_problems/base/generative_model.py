@@ -124,9 +124,15 @@ class GenerativeModel:
         return torch.zeros(1, dtype=torch.bool, device=state.device)
 
     def state_repr(self, state: torch.Tensor) -> str:
+        """
+        Returns a string representation of a state
+        """
         return str(state.cpu())
 
     def action_repr(self, action: torch.Tensor) -> str:
+        """
+        Returns a string representation of an action
+        """
         return str(action.cpu())
 
     def get_info(self) -> str:
@@ -166,6 +172,3 @@ class GenerativeModel:
         Returns any data that is shared across environments
         """
         return None
-
-    def get_info(self):
-        return ""

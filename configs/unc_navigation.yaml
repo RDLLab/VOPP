@@ -1,21 +1,11 @@
-#seed: 5003
-
 logfile_postfix: unc_navigation
 
 discount_factor: 0.983
 n_steps: 60
-
 num_envs: 50000
-max_sampled_episodes: 100000000
+max_sampled_episodes: 0 # Plan until timeout
 simulate_headless: False
 pomdp_model: unc_navigation
-reference_policy: preference_policy
-policy: prob_max_policy
-backup_fn: ref_solver_iterative
 eta: 2.0
-alpha_t: 1.0
-beta_t: 1.0
 max_search_depth: 60
 num_belief_particles: 300000
-
-continuous_observations: False

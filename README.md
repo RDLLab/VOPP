@@ -42,7 +42,7 @@ Next, clone this repository and install its requirements via
 where ``<VOPP_DIR>`` is a directory of your choice.
 		 
 ## Running VOPP
-To run VOPP on the provided benchmark problems, activate your conda environment and run
+To run VOPP on the provided benchmark problems, activate your Conda environment and run
 
     python <VOPP_DIR>/problem.py --config <VOPP_DIR>/configs/<PROBLEM_CONFIGURATION>.yaml
   

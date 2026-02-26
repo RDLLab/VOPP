@@ -1,8 +1,8 @@
 import torch
 
 class Policy:
-    def __init__(self, device, generative_model, args_cli):
-        self._device = device                
+    def __init__(self, generative_model, args_cli):
+        self._device = args_cli.device                
         
     def __call__(self, **kwargs) -> torch.Tensor:        
         return self.sample(**kwargs)

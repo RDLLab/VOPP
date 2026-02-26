@@ -1,47 +1,35 @@
 import torch
-from tree.tree import Tree
 import time
 import math
-from progressive_widener import ProgressiveWidener
 
-# Will be removed later
-def print_rows(tensor):
-    for i in range(tensor.shape[0]):
-        print(f"{i}: {tensor[i]}")
-
-def _current_depth_old(n_iters, max_iter, max_depth):
-    return min(math.floor(((max_depth - 1) / (max_iter-1)) * n_iters + 1), max_depth)
+from tree.tree import Tree
+from policies.adaptive.preference_policy import PreferencePolicy
+from policies.prob_max.prob_max_policy import ProbMaxPolicy
+from backup.ref_solver_iterative.ref_solver_iterative import RefSolverIterativeBackupFn
 
 def _current_depth(current_depth, n_iters, alpha=0.5, beta=1.0, max_depth=1000):
-    #new_depth = current_depth
     new_depth = int(beta * (n_iters ** alpha) + 1)
-    '''if current_depth <  v:
-        new_depth += 1'''
-
     return min(new_depth, max_depth)
 
 class ParallelRefSolver:
     def __init__(
             self, 
             args_cli,
-            pomdp_model, 
-            reference_policy, # Reference policy
-            policy, # Action selection policy
-            backup_fn, # Backup function to use
+            pomdp_model,
         ):
         self.args_cli = args_cli
         self.pomdp_model = pomdp_model
-        self._reference_policy = reference_policy
-        self._policy = policy
-        self._backup_function = backup_fn
-        if self.args_cli.continuous_observations:
-            self._progressive_widener = ProgressiveWidener(
-                self.pomdp_model.obs_shape,
-                self.pomdp_model._generative_model.likelihood,
-                alpha_o=self.args_cli.alpha_o, 
-                beta_o=self.args_cli.beta_o,
-                device=self.pomdp_model._device,                
-            )
+        self._reference_policy = PreferencePolicy(            
+            self.pomdp_model._generative_model, 
+            args_cli
+        )
+        self._policy = ProbMaxPolicy(
+            self.pomdp_model._generative_model, 
+            args_cli
+        )
+        self._backup_function = RefSolverIterativeBackupFn(
+            self._reference_policy,            
+        )
 
     def reset(self):        
         self.pomdp_model.reset()
@@ -51,18 +39,16 @@ class ParallelRefSolver:
         tree = Tree(device=self.pomdp_model._device)
 
         # Initialize reference policy 
-        self._reference_policy.reset()
-        if self.args_cli.continuous_observations:
-            self._progressive_widener.reset()      
+        self._reference_policy.reset()        
 
         # Sample episodes until we've sampled max_sampled_episodes episodes,
         # or the max planning time per step has been reached     
         num_sampled_episodes = 0 
         time_start = time.time()
         n_iters = 0
-        max_iter = math.ceil(self.args_cli.max_sampled_episodes / self.args_cli.num_envs)
+        max_n_episodes = self.args_cli.max_sampled_episodes
         depth = 1        
-        for _ in range(max_iter):
+        while True:
             # Determine maximum search depth for this iteration
             depth = _current_depth(
                 depth, 
@@ -81,9 +67,12 @@ class ParallelRefSolver:
             # Backup
             q_values = self._backup_function(tree, gamma=self.args_cli.discount_factor)
 
-            # Check of planning for the current step is over
-            num_sampled_episodes += states.shape[0]                   
             elapsed = time.time() - time_start
+
+            # Check if planning for the current step is over
+            num_sampled_episodes += states.shape[0]
+            if max_n_episodes > 0 and num_sampled_episodes >= max_n_episodes:
+                break
             if elapsed >= self.args_cli.planning_time_per_step:
                 break
 
@@ -138,15 +127,7 @@ class ParallelRefSolver:
 
             # Early exit when all states are terminal
             if state.shape[0] == 0:                
-                break                                           
-
-            if self.args_cli.continuous_observations:                
-                observation, state = self._progressive_widener.widen(
-                    tree, 
-                    current_nodes, 
-                    action, 
-                    observation, state
-                )
+                break
 
             # Insert observations into tree
             current_nodes = tree.insert_observation(

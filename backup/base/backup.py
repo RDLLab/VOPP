@@ -1,7 +1,7 @@
 import torch
 
 class BackupFn:
-    def __init__(self, **kwargs):
+    def __init__(self):
         pass
 
     def __call__(self, tree, gamma=0.95) -> torch.Tensor:

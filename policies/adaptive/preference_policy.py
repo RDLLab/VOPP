@@ -5,8 +5,8 @@ from itertools import product
 from utils.utils import filter_rows, matching_row_indices
 
 class PreferencePolicy(Policy):
-    def __init__(self, device, generative_model, args_cli):
-        super().__init__(device, generative_model, args_cli)
+    def __init__(self, generative_model, args_cli):
+        super().__init__(generative_model, args_cli)
         if not hasattr(args_cli, 'eta'):
             self.eta = 0.2
         else:
