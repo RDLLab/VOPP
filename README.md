@@ -1,5 +1,7 @@
 
 # Vectorized Online POMDP Planner (VOPP)
+⚠️ This is an alpha release and the code may contain bugs.
+
 This repository contains the source code for the paper.
 
 **Vectorized Online POMDP Planning** [[Paper]](https://arxiv.org/abs/2510.27191)
