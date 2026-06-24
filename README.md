@@ -61,6 +61,7 @@ New POMDP problems can be added by implementing a generative model class that in
 
 ```python
 import torch
+from typing import Optional
 from pomdp_problems.base.generative_model import GenerativeModel
 
 class MyPOMDPProblem(GenerativeModel):
@@ -72,22 +73,33 @@ class MyPOMDPProblem(GenerativeModel):
     def num_actions(self) -> int:
         ...
 
-    def sample_initial_belief(self, num_samples=1) -> torch.Tensor:
+    def sample_initial_belief(self, num_samples: int = 1) -> torch.Tensor:
         ...
         
-    def sample(self, state, action, **kwargs) -> dict:
+    def sample(
+        self, 
+        state: torch.Tensor, 
+        action: torch.Tensor, 
+        **kwargs,
+    ) -> dict:
         ...
 
     def likelihood(
-	    self, 
-	    observation, 
-	    prev_state, 
-	    next_state, 
-	    action,
-	    log_likelihood: bool = False) -> torch.Tensor:
+        self,
+        observation: torch.Tensor,
+        prev_state: torch.Tensor,
+        next_state: torch.Tensor,
+        action: torch.Tensor,
+        log_likelihood: bool = False,
+    ) -> torch.Tensor:
         ...
 
-    def heuristics(self, state, action, current_nodes=None) -> torch.Tensor:
+    def heuristics(
+        self, 
+        state: torch.Tensor, 
+        action: torch.Tensor, 
+        current_nodes: Optional[torch.Tensor] = None,
+    ) -> torch.Tensor:
         ...
 
 ```
@@ -150,7 +162,9 @@ Once the generative model and configuration file have been implemented, the prob
 ```bash
 python <VOPP_DIR>/run_vopp.py --config <PATH_TO_CONFIG>.yaml
 ```
+
 ### 4. Generative model implementation details
+
 #### Action and observation representation
 
 Our implementation of VOPP assumes **discrete actions** and **discrete observations**. Actions and observations are represented by integer IDs.
