@@ -60,6 +60,7 @@ python <VOPP_DIR>/run_vopp.py --config <VOPP_DIR>/configs/ma_rocksample.yaml
 New POMDP problems can be added by implementing a generative model class that inherits from `pomdp_problems/base/generative_model.py` and provides the following methods detailed in [Generative Model Implementation Details](#4-generative-model-implementation-details):
 
 ```python
+import torch
 from pomdp_problems.base.generative_model import GenerativeModel
 
 class MyPOMDPProblem(GenerativeModel):
