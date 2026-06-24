@@ -304,7 +304,7 @@ class CrowdNav(GenerativeModel):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.gamma = kwargs.get('args_cli').discount_factor
-        self._action_ranges = [[i for i in range(5)]]
+        self._num_actions = 5
         self._device = kwargs.get('args_cli').device
         self._headless = kwargs.get('args_cli').headless        
         self._map_size_x = float(kwargs.get('args_cli').map_size_x)
@@ -312,7 +312,6 @@ class CrowdNav(GenerativeModel):
         self._num_peds = int(kwargs.get('args_cli').num_peds)
         self._num_near_peds = int(kwargs.get('args_cli').num_near_peds)
         self._ped_noise_std = 0.05
-        #self._ped_noise_std = 0.025        
         self._safety_radius = 1.0
         self._curiosity_distance = float(kwargs.get('args_cli').curiosity_distance)
         self._curiosity_prob = float(kwargs.get('args_cli').curiosity_prob)
@@ -322,12 +321,7 @@ class CrowdNav(GenerativeModel):
             dtype=torch.float32, 
             device=self._device,
         )
-        self._goal_radius = 2.0
-
-        '''self._step_cost = -1.0
-        self._goal_reward = 100.0
-        self._collision_penalty = -50.0
-        self._yell_penalty = -5.0'''
+        self._goal_radius = 2.0        
 
         self._step_cost = -1.0
         self._goal_reward = 200.0        
@@ -343,12 +337,8 @@ class CrowdNav(GenerativeModel):
             self.exec_env = kwargs.get('exec_env')
 
     @property
-    def action_ranges(self):
-        return self._action_ranges
-
-    @property
-    def state_shape(self):
-        return (5*(self._num_near_peds+1),)
+    def num_actions(self):
+        return self._num_actions    
 
     def state_repr(self, state):
         return "None"
@@ -621,13 +611,16 @@ class CrowdNav(GenerativeModel):
             "next_state": next_state,         # (B, D)
             "observation": obs,               # (B,)
             "reward": reward,                 # (B,)
-            "terminal": reached_goal.clone(), # (B,)
-            "nsteps": 1,
-            "info": {}
+            "terminal": reached_goal.clone(), # (B,)            
         }
 
 
-    def heuristics(self, state: torch.Tensor, action: torch.Tensor, current_nodes: Optional[torch.Tensor] = None) -> torch.Tensor:
+    def heuristics(
+        self, 
+        state: torch.Tensor, 
+        action: torch.Tensor, 
+        current_nodes: Optional[torch.Tensor] = None
+    ) -> torch.Tensor:
         """
         Heuristic upper bound on expected return: assumes robot moves straight to goal,
         ignoring all pedestrians (i.e., best-case optimistic estimate).

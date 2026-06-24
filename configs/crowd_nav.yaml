@@ -1,7 +1,25 @@
-#seed: 5003
-
 logfile_postfix: crowd_nav
 
+# Use the crowd_nav generative model
+pomdp_model: crowd_nav
+# POMDP discount factor
+discount_factor: 0.95
+# Max number of steps before the problem terminates
+n_steps: 200
+# Number of parallel simulations during planning
+num_envs: 30000
+# Plan until timeout
+max_sampled_episodes: 0
+# Visualize the environment after every step
+simulate_headless: False
+# VOPP's temperature parameter
+eta: 0.5
+# Maximum depth of the search trees
+max_search_depth: 90
+# Number of particles used to approximate beliefs
+num_belief_particles: 30000
+
+# Map & pedestrian parameters
 map_size_x: 50
 map_size_y: 40
 num_peds: 300
@@ -9,21 +27,3 @@ num_near_peds: 6
 curiosity_distance: 4.0
 curiosity_prob: 0.5
 move_prob: 0.9
-
-discount_factor: 0.95
-n_steps: 200
-
-num_envs: 30000
-max_sampled_episodes: 100000000
-simulate_headless: False
-pomdp_model: crowd_nav
-reference_policy: preference_policy
-policy: prob_max_policy
-backup_fn: ref_solver_iterative
-eta: 0.5
-alpha_t: 1.0
-beta_t: 1.0
-max_search_depth: 90
-num_belief_particles: 30000
-
-continuous_observations: False

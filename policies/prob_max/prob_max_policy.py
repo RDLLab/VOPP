@@ -8,5 +8,6 @@ class ProbMaxPolicy(Policy):
     def sample(self, **kwargs) -> torch.Tensor:
         reference_policy = kwargs.get('reference_policy')
         root_belief_action_weights = reference_policy.belief_action_weights(0) 
-        best_action = reference_policy.action_value(0, torch.argmax(root_belief_action_weights))   
-        return best_action.view(1, -1)       
+        best_action_id = torch.argmax(root_belief_action_weights)
+        return best_action_id.view(1, 1)   
+            

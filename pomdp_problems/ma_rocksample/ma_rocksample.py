@@ -436,31 +436,19 @@ class MaRocksample(GenerativeModel):
         super().__init__(**kwargs)
         self.gamma = kwargs.get('args_cli').discount_factor        
         self._device = kwargs.get('args_cli').device        
-        self.headless = kwargs.get('args_cli').headless
+        self.headless = kwargs.get('args_cli').headless        
 
-        self._num_agents = 2
+        self._num_agents = 2        
         self._num_rocks = kwargs.get('args_cli').num_rocks
+        self._num_actions = int(pow(self._num_rocks + 5, self._num_agents))
         self._map_size = kwargs.get('args_cli').map_size
-        self._action_ranges = [[i for i in range(int(pow(self._num_rocks+5, self._num_agents)))]]
         self.fig, self.ax = None, None
         if self.role == 'planning':
-            self.exec_env = kwargs.get('exec_env', None)
+            self.exec_env = kwargs.get('exec_env', None)    
         
     @property
-    def state_shape(self):
-        return (int(4+self._num_rocks*2),)
-
-    @property
-    def action_shape(self):
-        return (int(pow(self._num_rocks+5, self._num_agents)),)
-
-    @property
-    def obs_shape(self):
-        return (1,)
-        
-    @property
-    def action_ranges(self):              
-        return self._action_ranges
+    def num_actions(self) -> int:
+        return self._num_actions
 
     def get_shared_data(self):
         return {'rock_positions': self.rock_positions, 'start_poses': self.start_poses}        
@@ -511,8 +499,6 @@ class MaRocksample(GenerativeModel):
             'observation': encode_observation(obs),
             'reward': reward,
             'terminal': done,
-            'nsteps': 1,
-            'info': None,
         }
 
     def heuristics(self, state: torch.Tensor, action: torch.Tensor, current_nodes: Optional[torch.Tensor] = None) -> torch.Tensor:            

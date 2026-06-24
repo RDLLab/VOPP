@@ -10,35 +10,23 @@ class GenerativeModel:
         args_cli = kwargs.get('args_cli')
         self.role = kwargs.get('role')        
         if self.role == 'exec':
-            #os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
             random.seed(args_cli.seed)
             np.random.seed(args_cli.seed)
             torch.manual_seed(args_cli.seed)
             torch.cuda.manual_seed(args_cli.seed)
             torch.cuda.manual_seed_all(args_cli.seed)
-            #torch.backends.cudnn.benchmark = False
-            #torch.backends.cudnn.deterministic = True
 
     def __call__(self, state: torch.Tensor, action: torch.Tensor, active_env_ids: torch.Tensor, **kwargs) -> dict:              
         output = self.sample(state, action, **kwargs)
-        output['reward'].view(-1)[~active_env_ids] = 0.0 # Set dummy reward for inactive environments
-        return output
+        output['reward'].view(-1)[~active_env_ids] = 0.0 # Set dummy reward for terminal environments
+        return output    
 
     @property
-    def state_shape(self):
-        raise NotImplementedError('state_shape not implemented')
-
-    @property
-    def action_shape(self):
-        raise NotImplementedError('action_shape not implemented')
-
-    @property
-    def obs_shape(self):
-        raise NotImplementedError('obs_shape not implemented')
-
-    @property
-    def action_ranges(self):
-        raise NotImplementedError("Property 'action_ranges' not implemented")
+    def num_actions(self) -> int:
+        """ 
+        The size (number of actions) of the action space
+        """
+        raise NotImplementedError('num_actions not implemented')
 
     def reset(self):
         """ 
@@ -61,7 +49,7 @@ class GenerativeModel:
                 reward: torch.Tensor of shape (N,) - The sampled reward
                 terminal: torch.Tensor of shape (N,) - The termination
                 nsteps: int - Number of environments steps taken
-                info: Any - Additional information
+                info: Any - Additional information (Optional)
         """
         raise NotImplementedError("'sample' not implemented")
 

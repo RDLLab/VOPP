@@ -421,63 +421,13 @@ class UncNavigation(GenerativeModel):
         self.headless = kwargs.get('args_cli').headless
         self._fig, self._ax = None, None
         if self.role == 'planning':
-            self.exec_env = kwargs.get('exec_env', None)
-        
-        '''sampled_maps = sample_maps_from_known(self.known_map, 10)
-        print("sampled_maps", sampled_maps.device)        
+            self.exec_env = kwargs.get('exec_env', None)   
 
-        while True:
-            k = input('go on')
-            A = 0
-            if k == 'q':
-                A = 7       
-            elif k == 'w':
-                A = 0
-            elif k == 'e':
-                A = 1
-            elif k == 'a':
-                A = 6
-            elif k == 's':
-                A = 8
-            elif k == 'd':
-                A = 2
-            elif k == 'z':
-                A = 5
-            elif k == 'x':
-                A = 4
-            elif k == 'c':
-                A = 3
-            action = torch.tensor([A, A, A, A, A, A, A, A, A, A], dtype=torch.int32, device=self._device)
-            print("STATE", sampled_maps.shape)
-            print("ACTION", action.shape)
-            sampled_maps, reward, done, obs = step(sampled_maps, action, self.all_actions)
-            print("reward", reward)
-            print("done", done)
-            print("obs", obs)
-            plot_map(sampled_maps[0])
-
-
-        print("k", k)
-        sdfsdfsd
-
-        for i in range(sampled_maps.shape[0]):
-            plot_map(sampled_maps[i])'''        
+        self._num_actions = 9
 
     @property
-    def state_shape(self):
-        return (13*15,)
-
-    @property
-    def action_shape(self):
-        return (2,)
-
-    @property
-    def obs_shape(self):
-        return (2,)
-        
-    @property
-    def action_ranges(self):
-        return self._action_ranges 
+    def num_actions(self) -> int:
+        return self._num_actions
 
     def get_shared_data(self):
         return {'known_map': self.known_map}
@@ -489,21 +439,6 @@ class UncNavigation(GenerativeModel):
             data = self.exec_env.get_shared_data()
             self.known_map = data['known_map'].to(device=self._device)
 
-        '''map_dir = "tmp"   
-        map_path = os.path.join(map_dir, "known_map.pt")     
-        if self.role == 'exec':
-            self.known_map = generate_known_map(self._device)
-            os.makedirs(map_dir, exist_ok=True)
-            torch.save({'known_map': self.known_map.cpu()}, map_path)
-        else:
-            # Check if map file exists
-            if not os.path.exists(map_path):
-                raise FileNotFoundError(f"Known map not found at {map_path}")
-
-            # Load map
-            data = torch.load(map_path, map_location=self._device, weights_only=True)
-            self.known_map = data['known_map']'''
-
     def sample_initial_belief(self, num_samples: int = 1) -> torch.Tensor:
         return sample_maps_from_known(self.known_map, num_samples).view(-1, 13*15)
 
@@ -514,11 +449,14 @@ class UncNavigation(GenerativeModel):
             'observation': observation_to_id(obs),
             'reward': reward,
             'terminal': done,
-            'nsteps': 1,
-            'info': None,
         }
 
-    def heuristics(self, state: torch.Tensor, action: torch.Tensor, current_nodes: Optional[torch.Tensor] = None) -> torch.Tensor:
+    def heuristics(
+        self, 
+        state: torch.Tensor, 
+        action: torch.Tensor, 
+        current_nodes: Optional[torch.Tensor] = None
+    ) -> torch.Tensor:
         return _heuristic(state.view(-1, 13, 15), discount_factor=self.gamma)
 
     def likelihood(

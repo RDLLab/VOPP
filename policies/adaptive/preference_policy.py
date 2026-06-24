@@ -12,11 +12,17 @@ class PreferencePolicy(Policy):
         else:
             self.eta = args_cli.eta
 
-        action_ranges = generative_model.action_ranges
+        '''action_ranges = generative_model.action_ranges
         actions = [list(p) for p in product(*action_ranges)]
         action_map = {i: torch.tensor(actions[i], dtype=torch.float32, device=self._device) for i in range(len(actions))}
         self.action_ids = torch.tensor(list(action_map.keys()), dtype=torch.long, device=self._device)
-        self.action_values = torch.stack([action_map[k.item()] for k in self.action_ids])
+        self.action_values = torch.stack([action_map[k.item()] for k in self.action_ids])'''
+        num_actions = generative_model.num_actions
+        self.action_ids = torch.arange(
+            num_actions,
+            dtype=torch.long,
+            device=self._device,
+        )
         self.reset()
 
     @property
@@ -26,8 +32,8 @@ class PreferencePolicy(Policy):
     def belief_action_weights(self, belief):
         return self._belief_action_weights[0, 1:]
 
-    def action_value(self, belief, action):
-        return self.action_values[action]     
+    '''def action_value(self, belief, action):
+        return self.action_values[action]'''     
 
     def reset(self):
         root_distr = torch.ones((len(self.action_ids),), dtype=torch.float32, device=self._device) / len(self.action_ids)
@@ -84,11 +90,8 @@ class PreferencePolicy(Policy):
         distr = self._make_policy_distribution(belief_indices_expanded)
 
         # Sample from the policy distributions
-        sampled_indices = distr.sample()        
-        return {
-            'action_id': self.action_ids[sampled_indices], # (N, )
-            'action_value': self.action_values[sampled_indices] # (N, K)
-        }
+        sampled_indices = distr.sample() 
+        return self.action_ids[sampled_indices]
 
     def update(self, **kwargs):
         current_nodes = kwargs.get('current_nodes') # Unique nodes

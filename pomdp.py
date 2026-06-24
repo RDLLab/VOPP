@@ -18,11 +18,7 @@ class POMDP:
     def reset(self):
         self._generative_model.reset()
         init_states = self._generative_model.sample_initial_belief(num_samples=self._num_belief_particles)
-        self._update_belief_distr(init_states)        
-
-    @property
-    def state_shape(self):
-        return self._generative_model.state_shape
+        self._update_belief_distr(init_states)
 
     @property
     def obs_shape(self):
@@ -87,14 +83,14 @@ class POMDP:
 
     def update_belief(self, action: torch.Tensor, observation: torch.Tensor, **kwargs):
         #print("=======================\nUPDATE BELIEF")        
-        states = torch.empty((0, self.state_shape[0]), dtype=self._belief_particles.dtype, device=self._device)
+        states = torch.empty((0, self._belief_particles.shape[1]), dtype=self._belief_particles.dtype, device=self._device)
         while states.shape[0] < self._num_belief_particles:
             sampled_states = self.sample_belief(**kwargs)            
             states = torch.cat((states, sampled_states), dim=0)   
 
         # Sample next states
         active_env_ids = torch.ones((states.shape[0],), dtype=torch.bool, device=self._device)        
-        next_states = torch.empty((0, self.state_shape[0]), dtype=self._belief_particles.dtype, device=self._device)
+        next_states = torch.empty((0, self._belief_particles.shape[1]), dtype=self._belief_particles.dtype, device=self._device)
         terminals = torch.empty((0,), dtype=torch.bool, device=self._device)
 
         n_iters = -(-self._num_belief_particles // self._num_envs)

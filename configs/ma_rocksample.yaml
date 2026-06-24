@@ -1,15 +1,24 @@
 logfile_postfix: ma_rocksample
 
-discount_factor: 0.983
-n_steps: 90
-num_envs: 60000
-max_sampled_episodes: 0 # Plan until timeout
-simulate_headless: False
+# Use the ma_rocksample generative model
 pomdp_model: ma_rocksample
+# POMDP discount factor
+discount_factor: 0.983
+# Max number of steps before the problem terminates
+n_steps: 90
+# Number of parallel simulations during planning
+num_envs: 60000
+# Plan until timeout
+max_sampled_episodes: 0
+# Visualize the environment after every step
+simulate_headless: False
+# VOPP's temperature parameter
 eta: 2.0
-alpha_t: 0.5
+# Maximum depth of the search trees
 max_search_depth: 90
+# Number of particles used to approximate beliefs
 num_belief_particles: 500000
 
+alpha_t: 0.5
 map_size: 20
 num_rocks: 20

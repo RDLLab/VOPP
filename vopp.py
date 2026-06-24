@@ -101,12 +101,10 @@ class VOPP:
             tree.update_current_node_visit_count(current_nodes)
 
             # Sample action from the reference policy            
-            sampled_action = self._reference_policy(state=state, belief_node=current_nodes, tree=tree)            
-            action_id = sampled_action['action_id']
-            action = sampled_action['action_value']
+            sampled_action = self._reference_policy(state=state, belief_node=current_nodes, tree=tree)
 
             # Simulate sampled actions            
-            outputs = self.pomdp_model.step(state, action, debug=False)
+            outputs = self.pomdp_model.step(state, sampled_action, debug=False)
             state = outputs['next_state']
             observation = outputs['observation']
             reward = outputs['reward']
@@ -115,15 +113,14 @@ class VOPP:
             # Insert actions into tree
             current_nodes = tree.insert_action(
                 current_nodes, 
-                action_id, 
+                sampled_action, 
                 reward, 
                 terminal,
             )            
 
             # Filter out states, actions and observations from terminal states
             state = state[~terminal.view(-1)] 
-            observation = observation[~terminal.view(-1)] 
-            action = action[~terminal.view(-1)]
+            observation = observation[~terminal.view(-1)]
 
             # Early exit when all states are terminal
             if state.shape[0] == 0:                
@@ -140,5 +137,5 @@ class VOPP:
             current_depth += 1 
 
         # Compute & update value-estimate of leaf nodes        
-        value_estimate = self.pomdp_model.heuristics(state, action, current_nodes=current_nodes)
+        value_estimate = self.pomdp_model.heuristics(state, sampled_action, current_nodes=current_nodes)
         tree.update_leaf_values(value_estimate, current_nodes)

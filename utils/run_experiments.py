@@ -60,8 +60,7 @@ def run_experiments(problem, planner, runs=1, primitive_steps=100, **kwargs):
     exp_logger.info("=======================================")
     exp_logger.info(f"Starting Test Runner")
     exp_logger.info(f"Start Time: {exp_time}")
-    exp_logger.info(f"Problem: {problem}")
-    exp_logger.info(f"Action shape: {planner._reference_policy.action_shape}")
+    exp_logger.info(f"Problem: {problem}")    
     exp_logger.info(f"Planner: {planner}")
 
     for run in range(runs):
@@ -217,12 +216,14 @@ def run_experiment(env_exec, planner, primitive_steps=100, seed=0, extras_logdir
         observation = output['observation']
         reward = output['reward'].cpu().item()
         terminal = output['terminal'].cpu().item()
-        nsteps = output['nsteps']
+        info = output.get("info", None)        
         logging.info(f"Next State:          {planner.pomdp_model._generative_model.state_repr(current_state)}")
         logging.info(f"Observation:         {observation}")
         logging.info(f"Total Steps:         {total_steps}")
         logging.info(f"Reward:              {reward}") 
         logging.info(f"Terminal:            {terminal}")
+        if info is not None:
+            logging.info(f"Info:            {info}")
 
         # Update belief      
         if not terminal:
@@ -241,10 +242,9 @@ def run_experiment(env_exec, planner, primitive_steps=100, seed=0, extras_logdir
         # Logging
         total_reward += reward
         total_reward_discounted += reward * (kwargs.get('discount_factor') ** i)
-        total_steps += nsteps
+        total_steps += 1
 
-        logging.info(f"Cum. Disc. Reward:   {total_reward_discounted}")
-        logging.info(f"Primitive Steps:     {nsteps}")        
+        logging.info(f"Cum. Disc. Reward:   {total_reward_discounted}")        
         logging.info(f"-------------------")
         logging.info(f"Planner (Num Sims):  {planning_statistics['num_sims']}")
         logging.info(f"Planner (Time):      {elapsed_planning}")

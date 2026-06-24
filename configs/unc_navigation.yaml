@@ -1,11 +1,20 @@
 logfile_postfix: unc_navigation
 
+# Use the unc_navigation generative model
+pomdp_model: unc_navigation 
+# POMDP discount factor
 discount_factor: 0.983
-n_steps: 60
-num_envs: 50000
-max_sampled_episodes: 0 # Plan until timeout
+# Max number of steps before the problem terminates
+n_steps: 60 
+# Number of parallel simulations during planning
+num_envs: 50000 
+# Plan until timeout
+max_sampled_episodes: 0
+# Visualize the environment after every step
 simulate_headless: False
-pomdp_model: unc_navigation
-eta: 2.0
-max_search_depth: 60
+# VOPP's temperature parameter
+eta: 2.0 
+# Maximum depth of the search trees
+max_search_depth: 60 
+# Number of particles used to approximate beliefs
 num_belief_particles: 300000
