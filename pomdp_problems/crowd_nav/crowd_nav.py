@@ -3,7 +3,6 @@ import os
 import time
 import torch
 import math
-import ray
 import numpy as np
 from pomdp_problems.base.generative_model import GenerativeModel
 import torch.nn.functional as F
@@ -425,7 +424,7 @@ class CrowdNav(GenerativeModel):
 
         if self.role == 'planning':
             # 1. Access true pedestrian state from execution environment (flattened)
-            exec_state = ray.get(self.exec_env.get_current_state.remote())  # (1, (1 + N) * 5)
+            exec_state = self.exec_env.get_current_state()  # (1, (1 + N) * 5)
             assert exec_state.ndim == 2 and exec_state.shape[1] == (1 + self._num_peds) * 5
 
             # 2. Truncate to robot + nearest K pedestrians (returned as flattened)
@@ -731,7 +730,7 @@ class CrowdNav(GenerativeModel):
             assert observation.shape[0] == B, \
                 f"Observation batch size {observation.shape[0]} does not match B={B}"
 
-        obs_bits_true, obs_ids_true = ray.get(self.exec_env.get_obs_bits.remote())  # (B, N_true)
+        obs_bits_true, obs_ids_true = self.exec_env.get_obs_bits()  # (B, N_true)
 
         # Predicted observation bits and pedestrian IDs from simulated state
         _, obs_bits_pred, pred_ids = observe(prev_state, next_state, N, return_obs_bits=True)  # (B, N_pred)
@@ -902,7 +901,7 @@ class CrowdNav(GenerativeModel):
         device = prior_belief_particles.device
 
         # 1. Get true states
-        current_state = ray.get(self.exec_env.get_current_state.remote()).expand(B, -1)
+        current_state = self.exec_env.get_current_state().expand(B, -1)
         curr, nearest_ids = _truncate_to_nearest_peds(current_state, N, return_ids=True)
         curr = curr.view(B, 1 + N, D)
 

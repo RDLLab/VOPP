@@ -4,7 +4,6 @@ import numpy as np
 import time
 import torch
 import copy
-import ray
 import os
 from datetime import datetime
 from .logger import LogHelper
@@ -177,7 +176,7 @@ def run_experiments(problem, planner, runs=1, primitive_steps=100, **kwargs):
 def run_experiment(env_exec, planner, primitive_steps=100, seed=0, extras_logdir=None, **kwargs):
     """Runs and the action-feedback loop for the POMDP and records results.""" 
 
-    reset_done = ray.get(env_exec.reset.remote())
+    reset_done = env_exec.reset()
     logging.info(f"DEVICE: {planner.pomdp_model._device}")
     print("reset_done", reset_done)
     planner.reset()
@@ -190,7 +189,7 @@ def run_experiment(env_exec, planner, primitive_steps=100, seed=0, extras_logdir
 
     env_evolution_steps = kwargs.get("env_evolution_steps", [])
 
-    current_state = ray.get(env_exec.sample_initial_belief.remote(num_samples=1))
+    current_state = env_exec.sample_initial_belief(num_samples=1)
     print(f"initial state: {planner.pomdp_model._generative_model.state_repr(current_state)}")
 
     i = 1
@@ -213,7 +212,7 @@ def run_experiment(env_exec, planner, primitive_steps=100, seed=0, extras_logdir
         logging.info(f"\nAction:              {planner.pomdp_model._generative_model.action_repr(action)}")
 
         # Execute action in the environment                
-        output = ray.get(env_exec.sample.remote(current_state, action))
+        output = env_exec.sample(current_state, action)
         current_state = output['next_state']
         observation = output['observation']
         reward = output['reward'].cpu().item()
@@ -265,7 +264,7 @@ def run_experiment(env_exec, planner, primitive_steps=100, seed=0, extras_logdir
 
         i += 1
 
-        exec_info = ray.get(env_exec.get_info.remote())
+        exec_info = env_exec.get_info()
         if exec_info != "":
             logging.info("=========== EXEC INFO ============")
             logging.info(exec_info)

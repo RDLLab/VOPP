@@ -3,7 +3,6 @@ import os
 import time
 import torch
 import math
-import ray
 import numpy as np
 from pomdp_problems.base.generative_model import GenerativeModel
 import torch.nn.functional as F
@@ -470,7 +469,7 @@ class MaRocksample(GenerativeModel):
         if self.role == 'exec':
             self.rock_positions, self.start_poses = generate_rocksample_map(self._map_size, self._num_rocks, self._device) 
         else:
-            data = ray.get(self.exec_env.get_shared_data.remote())
+            data = self.exec_env.get_shared_data()
             self.rock_positions = data['rock_positions'].to(device=self._device)
             self.start_poses = data['start_poses'].to(device=self._device)
 

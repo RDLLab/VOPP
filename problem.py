@@ -2,9 +2,8 @@ import sys
 import os
 import argparse
 import yaml
-#import pomdp_py
+
 import importlib
-import ray
 import torch
 import random
 import time
@@ -14,7 +13,6 @@ from utils.run_experiments import run_experiments, run_experiment
 from pomdp import POMDP
 from parallel_ref_solver import ParallelRefSolver
 
-ray.init(num_gpus=1)
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 torch.set_printoptions(precision=10, sci_mode=False)
@@ -156,7 +154,7 @@ def setup_problem(args_cli):
     GenerativeModel = registered_models[args_cli.pomdp_model]    
 
     # Make generative model for execution
-    generative_model_exec = ray.remote(num_gpus=0.01)(GenerativeModel).remote(        
+    generative_model_exec = GenerativeModel(        
         args_cli=args_cli,
         num_envs=args_cli.num_envs, 
         role='exec',

@@ -3,7 +3,6 @@ import os
 import time
 import torch
 import math
-import ray
 import numpy as np
 from pomdp_problems.base.generative_model import GenerativeModel
 import torch.nn.functional as F
@@ -487,7 +486,7 @@ class UncNavigation(GenerativeModel):
         if self.role == 'exec':
             self.known_map = generate_known_map(self._device)
         else:
-            data = ray.get(self.exec_env.get_shared_data.remote())
+            data = self.exec_env.get_shared_data()
             self.known_map = data['known_map'].to(device=self._device)
 
         '''map_dir = "tmp"   
