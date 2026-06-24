@@ -412,7 +412,7 @@ def _heuristic_old(states: torch.Tensor, discount_factor: float = 0.95) -> torch
 class UncNavigation(GenerativeModel):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.gamma = kwargs.get('args_cli').discount_factor
+        self.gamma = kwargs.get('args_cli').discount_factor        
         self._action_ranges = [[i for i in range(9)]]
         self._device = kwargs.get('args_cli').device        
         self.step_penalty = -1.0
@@ -440,10 +440,19 @@ class UncNavigation(GenerativeModel):
             self.known_map = data['known_map'].to(device=self._device)
 
     def sample_initial_belief(self, num_samples: int = 1) -> torch.Tensor:
-        return sample_maps_from_known(self.known_map, num_samples).view(-1, 13*15)
+        initial_belief_particles = sample_maps_from_known(
+            self.known_map, 
+            num_samples
+        ).view(-1, 13*15)
+        return initial_belief_particles
 
     def sample(self, state: torch.Tensor, action: torch.Tensor, **kwargs) -> dict:        
-        next_state, reward, done, obs = step(state.view(-1, 13, 15), action.squeeze(-1).to(torch.int32), self.all_actions)        
+        next_state, reward, done, obs = step(
+            state.view(-1, 13, 15), 
+            action, 
+            self.all_actions
+        )
+
         return {
             'next_state': next_state.view(-1, 13*15),
             'observation': observation_to_id(obs),
@@ -456,8 +465,9 @@ class UncNavigation(GenerativeModel):
         state: torch.Tensor, 
         action: torch.Tensor, 
         current_nodes: Optional[torch.Tensor] = None
-    ) -> torch.Tensor:
-        return _heuristic(state.view(-1, 13, 15), discount_factor=self.gamma)
+    ) -> torch.Tensor:        
+        heuristic_values = _heuristic(state.view(-1, 13, 15), discount_factor=self.gamma)
+        return heuristic_values
 
     def likelihood(
         self, 
@@ -671,4 +681,4 @@ class UncNavigation(GenerativeModel):
             ax.set_aspect('equal')
 
         self._fig.canvas.draw()
-        self._fig.canvas.flush_events()      
+        self._fig.canvas.flush_events()  

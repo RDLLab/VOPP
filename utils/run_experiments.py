@@ -54,7 +54,10 @@ def run_experiments(problem, planner, runs=1, primitive_steps=100, **kwargs):
     
     logfile_postfix = kwargs.get('logfile_postfix', "")
 
-    exp_logger_name = f"{exp_time}_{logfile_postfix}_summary"
+    if logfile_postfix is not None:
+        exp_logger_name = f"{exp_time}_{logfile_postfix}_summary"
+    else:
+        exp_logger_name = f"{exp_time}_summary"
     exp_logger = LogHelper.get_logger(exp_logger_name, file_logging, exp_logger_name, log_directory)
 
     exp_logger.info("=======================================")
@@ -65,7 +68,10 @@ def run_experiments(problem, planner, runs=1, primitive_steps=100, **kwargs):
 
     for run in range(runs):
         exp_logger.info(f"Starting Run {run + 1}")
-        logfile_str = f"{exp_time}_{logfile_postfix}_run_{run + 1}"
+        if logfile_postfix is not None:
+            logfile_str = f"{exp_time}_{logfile_postfix}_run_{run + 1}"
+        else:
+            logfile_str = f"{exp_time}_run_{run + 1}"
         print("log_directory", log_directory)
         extras_logdir = None
         if log_directory is not None:
@@ -78,7 +84,7 @@ def run_experiments(problem, planner, runs=1, primitive_steps=100, **kwargs):
         if len(env_evolution_steps):
             problem.reset_environment()
 
-        try:
+        try:            
             total_reward, total_reward_discounted, total_steps, success, mean_planning_time, mean_num_sims \
                 = run_experiment(problem, planner, primitive_steps, seeds[run], extras_logdir, **kwargs)
 

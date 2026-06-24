@@ -1,5 +1,3 @@
-logfile_postfix: crowd_nav
-
 # Use the crowd_nav generative model
 pomdp_model: crowd_nav
 # POMDP discount factor

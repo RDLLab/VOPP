@@ -1,5 +1,3 @@
-logfile_postfix: unc_navigation
-
 # Use the unc_navigation generative model
 pomdp_model: unc_navigation 
 # POMDP discount factor

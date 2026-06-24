@@ -96,8 +96,8 @@ class POMDP:
         n_iters = -(-self._num_belief_particles // self._num_envs)
         for i in range(n_iters):
             _active_env_ids = active_env_ids[i*self._num_envs:(i+1)*self._num_envs]
-            _state = states[i*self._num_envs:(i+1)*self._num_envs]
-            _action = action.repeat(self._num_envs, 1)
+            _state = states[i*self._num_envs:(i+1)*self._num_envs]            
+            _action = action.repeat(self._num_envs)            
             outputs = self.step(_state, _action, _active_env_ids, belief_update=True)
 
             _next_states = outputs['next_state']

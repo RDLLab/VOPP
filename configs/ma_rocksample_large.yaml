@@ -1,5 +1,3 @@
-logfile_postfix: ma_rocksample_large
-
 # Use the ma_rocksample generative model
 pomdp_model: ma_rocksample
 # POMDP discount factor

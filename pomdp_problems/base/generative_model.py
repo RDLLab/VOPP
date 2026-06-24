@@ -19,39 +19,42 @@ class GenerativeModel:
     def __call__(self, state: torch.Tensor, action: torch.Tensor, active_env_ids: torch.Tensor, **kwargs) -> dict:              
         output = self.sample(state, action, **kwargs)
         output['reward'].view(-1)[~active_env_ids] = 0.0 # Set dummy reward for terminal environments
-        return output    
+        return output
 
     @property
     def num_actions(self) -> int:
         """ 
-        The size (number of actions) of the action space
+        Number of discrete actions in the action space.
         """
-        raise NotImplementedError('num_actions not implemented')
+        raise NotImplementedError("num_actions not implemented")
+
 
     def reset(self):
         """ 
-        Perform reset operations if needed
+        Perform reset operations if needed.
         """
-        pass           
+        pass
+
 
     def sample(self, state: torch.Tensor, action: torch.Tensor, **kwargs) -> dict:
         """ 
-        Given a state and an action, sample a next state, observation, reward, and termination.
+        Given a batch of states and actions, sample next states, observations,
+        rewards, and termination flags.
 
         Args:
-            state: torch.Tensor of shape (N, state_dimensions) - The state
-            action: torch.Tensor of shape (N, action_dimensions) - The action
+            state: torch.Tensor of shape (B, state_dim).
+            action: torch.Tensor of shape (B,). Each entry is a discrete action ID.
 
         Returns:
             Dictionary containing:
-                next_state: torch.Tensor of shape (N, state_dimensions) - The sampled next state
-                observation: torch.Tensor of shape (N,) - The sampled observations
-                reward: torch.Tensor of shape (N,) - The sampled reward
-                terminal: torch.Tensor of shape (N,) - The termination
-                nsteps: int - Number of environments steps taken
-                info: Any - Additional information (Optional)
+                next_state: torch.Tensor of shape (B, state_dim).
+                observation: torch.Tensor of shape (B, ...) or (B,).
+                reward: torch.Tensor of shape (B,).
+                terminal: torch.Tensor of shape (B,).
+                info: Optional additional information.
         """
         raise NotImplementedError("'sample' not implemented")
+
 
     def likelihood(
         self, 
@@ -59,43 +62,58 @@ class GenerativeModel:
         prev_state: torch.Tensor, 
         next_state: torch.Tensor, 
         action: torch.Tensor, 
-        log_likelihood: bool = False,
-        is_encoded_observation: bool = True,
+        log_likelihood: bool = False,        
     ) -> torch.Tensor:
         """ 
-        Given the next state and actions, compute the likelihood of the given observation
+        Compute the likelihood of an observation for a batch of candidate
+        transitions.
 
         Args:
-            observation: torch.Tensor of shape (1, observation_dimension) - The observation
-            state: torch.Tensor of shape (N, state_dimensions) - The next states
-            action: torch.Tensor of shape (N, action_dimensions) - The actions
+            observation: torch.Tensor containing the observation. This may be a
+                single observation, e.g. shape (1,) for encoded observations, or
+                another problem-specific observation shape.
+            prev_state: torch.Tensor of shape (B, state_dim).
+            next_state: torch.Tensor of shape (B, state_dim).
+            action: torch.Tensor of shape (B,). Each entry is a discrete action ID.
+            log_likelihood: If True, return log-likelihood values. Otherwise,
+                return likelihood values.
 
         Returns:
-            torch.Tensor of shape (N, 1) - The computed likelihood
+            torch.Tensor of shape (B,) containing one likelihood or log-likelihood
+            value per candidate transition.
         """
-        raise NotImplementedError("'likelihood' not implmented")
+        raise NotImplementedError("'likelihood' not implemented")
 
-    def sample_initial_belief(self, num_samples=1) -> torch.Tensor:
+
+    def sample_initial_belief(self, num_samples: int = 1) -> torch.Tensor:
         """ 
-        Sample states from the initial belief
+        Sample particles from the initial belief distribution.
 
         Args:
-            num_samples: int - Number of states to sample           
+            num_samples: Number of particles to sample.
 
         Returns:
-            torch.Tensor of shape (N, state_dimensions) - The sampled states
+            torch.Tensor of shape (num_samples, state_dim).
         """
         raise NotImplementedError("'sample_initial_belief' not implemented")
 
-    def heuristics(self, state: torch.Tensor, action: torch.Tensor, current_nodes: Optional[torch.Tensor] = None) -> torch.Tensor:
+
+    def heuristics(
+        self, 
+        state: torch.Tensor, 
+        action: torch.Tensor, 
+        current_nodes: Optional[torch.Tensor] = None,
+    ) -> torch.Tensor:
         """ 
-        Given a state compute a heuristic estimate of the value function.
+        Compute a heuristic value estimate for a batch of states and actions.
 
         Args:
-            state: torch.Tensor of shape (N, state_dimensions) - The state            
+            state: torch.Tensor of shape (B, state_dim).
+            action: torch.Tensor of shape (B,). Each entry is a discrete action ID.
+            current_nodes: Optional planner-specific node indices.
 
         Returns:
-            torch.Tensor of shape (N,) - The heuristic estimate
+            torch.Tensor of shape (B,) containing one heuristic value per state-action pair.
         """
         raise NotImplementedError("'heuristics' not implemented")
 
@@ -107,7 +125,7 @@ class GenerativeModel:
             state: torch.Tensor of shape (1, state_dimensions) - The state            
 
         Returns:
-            torch.Tensor of shape (1) - Boolean indicating whether the state is a goal state
+            torch.Tensor of shape (1,) - Boolean indicating whether the state is a goal state
         """
         return torch.zeros(1, dtype=torch.bool, device=state.device)
 

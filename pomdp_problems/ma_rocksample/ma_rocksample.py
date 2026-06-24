@@ -194,7 +194,7 @@ def _postprocess_belief_particles(
     device = prior_belief_particles.device
 
     # Assuming the decode_action_ids function is correctly defined elsewhere and works
-    a = decode_action_ids(action.squeeze(-1), num_rocks)
+    a = decode_action_ids(action.view(-1), num_rocks)
 
     # Agent positions from the belief particles
     agent_pos = belief_particles[:, :4].view(B, 2, 2)
@@ -482,7 +482,7 @@ class MaRocksample(GenerativeModel):
 
     def sample(self, state: torch.Tensor, action: torch.Tensor, **kwargs) -> dict: 
         B = state.shape[0]
-        actions = decode_action_ids(action.squeeze(-1).to(dtype=torch.int64), num_rocks=self.rock_positions.shape[0])        
+        actions = decode_action_ids(action.to(dtype=torch.int64).view(-1), num_rocks=self.rock_positions.shape[0])        
         next_state, reward, done, obs = step(state, actions, self.rock_positions.unsqueeze(0).expand(B, -1, -1), self._map_size) 
 
         if self.role == "exec":
@@ -492,7 +492,7 @@ class MaRocksample(GenerativeModel):
             if rew == -10:
                 self._num_bad_rock_samplings += 1
             elif rew == -20:
-                self._num_bad_rock_samplings += 2            
+                self._num_bad_rock_samplings += 2
         
         return {
             'next_state': next_state,
@@ -653,7 +653,7 @@ class MaRocksample(GenerativeModel):
         return likelihoods
 
     def action_repr(self, action: torch.Tensor) -> str:
-        act = action.squeeze(-1).to(dtype=torch.int64)
+        act = action.to(dtype=torch.int64).view(-1)
         decoded = decode_action_ids(act, num_rocks=self._num_rocks)  # shape (1, 2)
 
         # Define mapping

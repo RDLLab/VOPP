@@ -9,5 +9,5 @@ class ProbMaxPolicy(Policy):
         reference_policy = kwargs.get('reference_policy')
         root_belief_action_weights = reference_policy.belief_action_weights(0) 
         best_action_id = torch.argmax(root_belief_action_weights)
-        return best_action_id.view(1, 1)   
+        return best_action_id
             
