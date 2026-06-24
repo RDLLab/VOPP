@@ -11,7 +11,7 @@ def _current_depth(current_depth, n_iters, alpha=0.5, beta=1.0, max_depth=1000):
     new_depth = int(beta * (n_iters ** alpha) + 1)
     return min(new_depth, max_depth)
 
-class ParallelRefSolver:
+class VOPP:
     def __init__(
             self, 
             args_cli,

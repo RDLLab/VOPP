@@ -11,7 +11,7 @@ import copy
 import numpy as np
 from utils.run_experiments import run_experiments, run_experiment
 from pomdp import POMDP
-from parallel_ref_solver import ParallelRefSolver
+from vopp import VOPP
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
@@ -175,7 +175,7 @@ def setup_problem(args_cli):
         device=args_cli.device,
     )        
 
-    planner = ParallelRefSolver(
+    planner = VOPP(
         args_cli,
         pomdp_model,            
     )
