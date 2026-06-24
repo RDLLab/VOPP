@@ -149,7 +149,7 @@ Once the generative model and configuration file have been implemented, the prob
 ```bash
 python <VOPP_DIR>/run_vopp.py --config <PATH_TO_CONFIG>.yaml
 ```
-### 4. Generative Model Implementation Details
+### 4. Generative model implementation details
 #### Action and observation representation
 
 Our implementation of VOPP assumes **discrete actions** and **discrete observations**. Actions and observations are represented by integer IDs.
