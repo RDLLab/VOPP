@@ -111,7 +111,6 @@ pomdp_problems/
 └── my_pomdp_problem/
     ├── my_pomdp_problem.py
     └── __init__.py
-
 ```
 
 The `__init__.py` file should register the new model:
