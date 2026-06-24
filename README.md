@@ -46,9 +46,9 @@ where ``<VOPP_DIR>`` is a directory of your choice.
 ## Running VOPP
 To run VOPP on the provided benchmark problems, activate your Conda environment and run
 
-    python <VOPP_DIR>/problem.py --config <VOPP_DIR>/configs/<PROBLEM_CONFIGURATION>.yaml
+    python <VOPP_DIR>/run_vopp.py --config <VOPP_DIR>/configs/<PROBLEM_CONFIGURATION>.yaml
   
   For instance, to solve the Multi-Agent Rocksample problem with VOPP, use
 
-	python <VOPP_DIR>/problem.py --config <VOPP_DIR>/configs/ma_rocksample.yaml
+	python <VOPP_DIR>/run_vopp.py --config <VOPP_DIR>/configs/ma_rocksample.yaml
 
