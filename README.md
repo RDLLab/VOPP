@@ -22,12 +22,15 @@ If you use this repository in your research, please cite the paper as follows:
 ```
 
 ## Requirements
-This project requires Python 3.11+ and the following packages:
 
-- PyTorch >= 2.7.1  
-- Matplotlib >= 3.10  
-- NumPy >= 2.3  
-- PyYAML >= 6.0  
+This project requires:
+
+- A CUDA-capable NVIDIA GPU with NVIDIA drivers and the CUDA Toolkit installed (see the official [CUDA Installation Guide for Linux](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html))
+- Python >= 3.11
+- PyTorch >= 2.7.1
+- Matplotlib >= 3.10
+- NumPy >= 2.3
+- PyYAML >= 6.0
 - SciPy >= 1.16
 
 ## Installation
