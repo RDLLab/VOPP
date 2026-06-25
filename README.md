@@ -7,6 +7,7 @@ VOPP is a massively parallel online POMDP solver. It represents planning as a se
 This repository contains the official implementation of the paper:
 
 **Vectorized Online POMDP Planning**
+
 [![arXiv](https://img.shields.io/badge/arXiv-2510.27191-b31b1b?logo=arxiv\&logoColor=white)](https://arxiv.org/abs/2510.27191)
 
 **Authors:**
