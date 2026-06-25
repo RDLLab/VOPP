@@ -1,13 +1,16 @@
 # Vectorized Online POMDP Planner (VOPP)
-⚠️ This is an alpha release and the code may contain bugs.
+
+> ⚠️ **This is an alpha release. The code is under active development and may contain bugs.**
 
 VOPP is a massively parallel online POMDP solver. It represents planning as a sequence of tensor operations and computes policies from tens of thousands of parallel simulations on modern GPUs, without requiring synchronization between concurrent simulations.
 
-This repository contains the official implementation of:
+This repository contains the official implementation of the paper:
 
-**Vectorized Online POMDP Planning** [[Paper]](https://arxiv.org/abs/2510.27191)
+**Vectorized Online POMDP Planning**
+[![arXiv](https://img.shields.io/badge/arXiv-2510.27191-b31b1b?logo=arxiv\&logoColor=white)](https://arxiv.org/abs/2510.27191)
 
-by [Marcus Hoerger](mailto:marcus.hoerger@anu.edu.au), [Muhammad Sudrajat](mailto:muhammad.sudrajat@anu.edu.au), and [Hanna Kurniawati](mailto:hanna.kurniawati@anu.edu.au).
+**Authors:**
+Marcus Hoerger, Muhammad Sudrajat, and Hanna Kurniawati
 
 ## Citation
 If you use this repository in your research, please cite the paper as follows:
